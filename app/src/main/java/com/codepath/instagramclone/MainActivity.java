@@ -7,7 +7,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.service.autofill.SaveCallback;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -19,8 +18,14 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseFile;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
+import com.parse.SaveCallback;
+
 import java.io.File;
-import java.text.ParseException;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -32,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
     private ImageView ivPostImage;
     private Button btnSubmit;
     private File photoFile;
+    private Button btnLogout;
+    private String photoFileName = "photo.jpg";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +49,17 @@ public class MainActivity extends AppCompatActivity {
         btnCaptureImage = findViewById(R.id.btnCaptureImage);
         ivPostImage = findViewById(R.id.ivPostImage);
         btnSubmit = findViewById(R.id.btnSubmit);
+        btnLogout = findViewById(R.id.btnLogin);
+
+//        btnLogout.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                //Log.i(TAG, "onClick logout button");
+//                //ParseUser.logOut();
+//                //ParseUser currentUser = ParseUser.getCurrentUser();
+//                //logout(currentUser);
+//            }
+//        });
 
         btnCaptureImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -67,9 +85,24 @@ public class MainActivity extends AppCompatActivity {
                 ParseUser currentUser = ParseUser.getCurrentUser();
                 savePost(description, currentUser, photoFile);
             }
-        });
-    }
 
+        });
+
+
+    }
+//    private void logout(ParseUser currentUser) {
+//        Log.i(TAG, "Attempting to logout user " + currentUser);
+//        if (currentUser != null) {
+//            // do stuff with the user
+//            ParseUser.logOut();
+//            currentUser = ParseUser.getCurrentUser();
+//        } else {
+//            Intent i = new Intent(MainActivity.this, LoginActivity.class);
+//            startActivity(i);
+//            finish();
+//            // show the signup or login screen
+//        }
+    //}
     private void launchCamera() {
         // create Intent to take a picture and return control to the calling application
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -91,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void OnActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
@@ -139,15 +172,17 @@ public class MainActivity extends AppCompatActivity {
                 etDescription.setText("");
                 ivPostImage.setImageResource(0);
             }
-        });
+
+    });
     }
+
 
     private void queryPost() {
         ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
         query.include(Post.KEY_USER);
         query.findInBackground(new FindCallback<Post>() {
             @Override
-            public void done(List<Post > posts, ParseException e) {
+            public void done(List<Post > posts, com.parse.ParseException e) {
                 if (e != null) {
                     Log.e(TAG, "Issue with getting posts", e);
                     return;

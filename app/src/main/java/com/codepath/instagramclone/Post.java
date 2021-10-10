@@ -1,7 +1,9 @@
 package com.codepath.instagramclone;
 
 import com.parse.ParseClassName;
+import com.parse.ParseFile;
 import com.parse.ParseObject;
+import com.parse.ParseUser;
 
 @ParseClassName("Post")
 public class Post extends  ParseObject{
@@ -27,10 +29,6 @@ public class Post extends  ParseObject{
     }
 
     public ParseUser getUser() {
-        return getParseUser(KEY_USER);
-    }
-
-    public void setUser() {
         return getParseUser(KEY_USER);
     }
 
